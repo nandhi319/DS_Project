@@ -5,6 +5,8 @@ mlflow
 notebook
 matplotlib
 python-box
+PyYAML
+tqdm
 ensure
 joblib
 types-PyYAML
