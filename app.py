@@ -1,43 +1,56 @@
-import os
-from pathlib import Path
-import logging
+from flask import Flask,render_template,request
+import os 
+import pandas as pd
+import numpy as np
+from src.DS.pipeline.prediction_pipeline import PredictionPipeline
 
-logging.basicConfig(level=logging.INFO, format='[%(asctime)s]: %(message)s:')
-project_name  = "DS"
-list_of_files =[
-    ".github/workflows/.gitkeep",
-    f"src/{project_name}/__init__.py",
-    f"src/{project_name}/components/__init__.py",
-    f"src/{project_name}/utils/__init__.py",
-    f"src/{project_name}/utils/common.py",
-    f"src/{project_name}/config/__init__.py",
-    f"src/{project_name}/config/configuration.py",
-    f"src/{project_name}/pipeline/__init__.py",
-    f"src/{project_name}/entity/__init__.py",
-    f"src/{project_name}/entity/config_entity.py",
-    f"src/{project_name}/constants/__init__.py",
-    "config/config.yaml",
-    "params.yaml",
-    "schema.yaml",
-    "main.py",
-    "Dockerfile",
-    "setup.py",
-    "research/research.ipynb",
-    "templates/index.html"
-]
+app = Flask(__name__) # initializing a flask app
 
-for filepath in list_of_files:
-    filepath = Path(filepath)
-    filedir,filename = os.path.split(filepath)
-    
-    if filedir !="":
-        os.makedirs(filedir,exist_ok=True)
-        logging.info(f"creating directory {filedir} for the file :{filename}")
-    if (not os.path.exists(filepath)) or (os.path.getsize(filepath)==0):
-        with open(filepath,"w") as f:
+@app.route('/',methods=['GET'])  # route to display the home page
+def homePage():
+    return render_template("index.html")
+
+
+@app.route('/train',methods=['GET'])  # route to train the pipeline
+def training():
+    os.system("python main.py")
+    return "Training Successful!" 
+
+
+@app.route('/predict',methods=['POST','GET']) # route to show the predictions in a web UI
+def index():
+    if request.method == 'POST':
+        try:
+            #  reading the inputs given by the user
+            fixed_acidity =float(request.form['fixed_acidity'])
+            volatile_acidity =float(request.form['volatile_acidity'])
+            citric_acid =float(request.form['citric_acid'])
+            residual_sugar =float(request.form['residual_sugar'])
+            chlorides =float(request.form['chlorides'])
+            free_sulfur_dioxide =float(request.form['free_sulfur_dioxide'])
+            total_sulfur_dioxide =float(request.form['total_sulfur_dioxide'])
+            density =float(request.form['density'])
+            pH =float(request.form['pH'])
+            sulphates =float(request.form['sulphates'])
+            alcohol =float(request.form['alcohol'])
+       
+         
+            data = [fixed_acidity,volatile_acidity,citric_acid,residual_sugar,chlorides,free_sulfur_dioxide,total_sulfur_dioxide,density,pH,sulphates,alcohol]
+            data = np.array(data).reshape(1, 11)
             
-            pass
-            logging.info(f"creating empty file: {filepath}")
+            obj = PredictionPipeline()
+            predict = obj.predict(data)
+
+            return render_template('results.html', prediction = str(predict))
+
+        except Exception as e:
+            print('The Exception message is: ',e)
+            return 'something is wrong'
+
     else:
-        logging.info(f"{filename} is already exists")
-        
+        return render_template('index.html')
+
+
+if __name__ == "__main__":
+	
+	app.run(host="0.0.0.0", port = 8080)

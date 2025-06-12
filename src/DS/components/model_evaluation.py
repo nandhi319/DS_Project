@@ -11,10 +11,10 @@ from src.DS.entity.config_entity import ModelEvaluationConfig
 from src.DS.constants import *
 from src.DS.utils.common import read_yaml, create_directories,save_json
 
-import os
-os.environ["MLFLOW_TRACKING_URI"] = "https://dagshub.com/nandhi319/DS_Project.mlflow"
-os.environ["MLFLOW_TRACKING_USERNAME"] = "nandhi319"
-os.environ["MLFLOW_TRACKING_PASSWORD"] = "bb4b6889dc14450e5f986967dae16091be91b37b"
+# import os
+# os.environ["MLFLOW_TRACKING_URI"] = "https://dagshub.com/nandhi319/DS_Project.mlflow"
+# os.environ["MLFLOW_TRACKING_USERNAME"] = "nandhi319"
+# os.environ["MLFLOW_TRACKING_PASSWORD"] = "bb4b6889dc14450e5f986967dae16091be91b37b"
 
 
 class ModelEvaluation:
